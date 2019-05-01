@@ -1,0 +1,65 @@
+push
+move
+250 250 0
+rotate
+y 15
+rotate
+x 15
+circle
+0 0 0 200
+
+push
+move
+-70 70 0
+push
+rotate
+x 90
+torus
+0 0 0 5 50
+pop
+push
+rotate
+y 90
+sphere
+0 0 0 30
+pop
+pop
+
+push
+move
+70 70 0
+push
+rotate
+x 90
+torus
+0 0 0 5 50
+pop
+push
+rotate
+y 90
+sphere
+0 0 0 30
+pop
+pop
+
+line
+-15 70 0 15 70 0
+line
+141 141 0 110 110 0
+line
+-141 141 0 -110 110 0
+
+push
+move
+0 -50 0
+box
+-50 0 10 100 30 20
+pop
+
+bezier
+-141 141 -200 200 -250 150 -188 68
+bezier
+141 141 200 200 250 150 188 68
+display
+save
+colorful_nerd.png
