@@ -5,8 +5,46 @@
 
 using namespace std;
 
+// lighting functions
+pixel get_lighting( double *normal, pixel alight, light plight, double *areflect, double *dreflect, double *sreflect);
+
+pixel calculate_ambient(pixel alight, double *areflect ){
+  alight.r *= areflect[0];
+  alight.g *= areflect[1];
+  alight.b *= areflect[2];
+  return alight;
+}
+
+pixel calculate_diffuse(light plight, double *dreflect, double *normal ){
+  double c = dot(normal, plight.v) / magnitude(noral) / magnitude(plight.v);
+  plight.r *= c;
+  plight.g *= c;
+  plight.b *= c;
+  return plight;
+}
+
+pixel calculate_specular(light plight, double *sreflect, double *normal ){
+  doubl *p = project(plight.v, normal);
+  
+}
+
+void limit_color( pixel * c );
+
+double magnitude(double *v){
+  return sqrt(dot(v, v));
+}
+
+double *project(double *u, double *v){
+  double *r = new double[3];
+  double c = dot(u, v) / dot(v, v);
+  r[0] = a[0] * c;
+  r[1] = a[1] * c;
+  r[2] = a[2] * c;
+  return r;
+}
+
 void normalize(double *v){
-  double mag = dot(v, v);
+  double mag = magnitude(v);
   for (int i = 0; i < 3; i ++)
     v[i] /= mag;
 }

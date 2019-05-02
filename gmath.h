@@ -5,7 +5,7 @@ typedef struct {
 } pixel;
 
 typedef struct {
-  int x, y, z;
+  double *v;
   int r, g, b;
 } light;
 
@@ -21,6 +21,8 @@ pixel calculate_specular(light plight, double *sreflect, double *normal );
 void limit_color( pixel * c );
 
 // vector functions
+double magnitude(double *v);
+
 void normalize(double *v);
 
 double dot(double *a, double *b);
