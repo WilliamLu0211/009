@@ -6,29 +6,44 @@
 using namespace std;
 
 // lighting functions
-pixel get_lighting( double *normal, pixel alight, light plight, double *areflect, double *dreflect, double *sreflect);
+pixel get_lighting( double *normal, pixel alight, light plight,
+                    double *areflect, double *dreflect, double *sreflect){
+  calculate_ambient(alight, areflect);
+  pixel diffuse = calculate_diffuse(plight, dreflect, normal);
+  pixel specular = calculate_specular(plight, sreflect, normal);
+  pixel total{alight.r + diffuse.r + specular.r,
+              alight.g + diffuse.g + specular.g,
+              alight.b + diffuse.b + specular.b};
+}
 
-pixel calculate_ambient(pixel alight, double *areflect ){
+void calculate_ambient(pixel &alight, double *areflect ){
   alight.r *= areflect[0];
   alight.g *= areflect[1];
   alight.b *= areflect[2];
-  return alight;
 }
 
 pixel calculate_diffuse(light plight, double *dreflect, double *normal ){
   double c = dot(normal, plight.v) / magnitude(noral) / magnitude(plight.v);
-  plight.r *= c;
-  plight.g *= c;
-  plight.b *= c;
-  return plight;
+  plight.r *= c * dreflect[0];
+  plight.g *= c * dreflect[1];
+  plight.b *= c * dreflect[2];
+  return pixel{plight.r, plight.g, plight.b};
 }
 
 pixel calculate_specular(light plight, double *sreflect, double *normal ){
-  doubl *p = project(plight.v, normal);
-  
+  double *p = project(plight.v, normal);
+  double *r = new double[3];
+  r[0] = 2 * p[0] - plight.v[0];
+  r[1] = 2 * p[1] - plight.v[1];
+  r[2] = 2 * p[2] - plight.v[2];
+  double c = pow(r[2] / magnitude(r), 4);
+  plight.r *= c * sreflect[0];
+  plight.g *= c * sreflect[1];
+  plight.b *= c * sreflect[2];
+  return pixel{plight.r, plight.g, plight.b};
 }
 
-void limit_color( pixel * c );
+void limit_color( pixel * c ){};
 
 double magnitude(double *v){
   return sqrt(dot(v, v));

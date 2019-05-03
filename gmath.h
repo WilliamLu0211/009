@@ -12,7 +12,7 @@ typedef struct {
 // lighting functions
 pixel get_lighting( double *normal, pixel alight, light plight, double *areflect, double *dreflect, double *sreflect);
 
-pixel calculate_ambient(pixel alight, double *areflect );
+void calculate_ambient(pixel alight, double *areflect );
 
 pixel calculate_diffuse(light plight, double *dreflect, double *normal );
 
@@ -22,6 +22,8 @@ void limit_color( pixel * c );
 
 // vector functions
 double magnitude(double *v);
+
+double *project(double *u, double *v);
 
 void normalize(double *v);
 
