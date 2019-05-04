@@ -51,13 +51,16 @@ Image::~Image(){
 
 void Image::initialize(int w, int h){
   double init = numeric_limits<double>::lowest();
+  pixel white{255, 255, 255};
   pixels = new pixel*[w];
   zbuf = new double*[w];
   for (int i = 0; i < w; i ++){
     pixels[i] = new pixel[h];
     zbuf[i] = new double[h];
-    for (int j = 0; j < h; j ++)
+    for (int j = 0; j < h; j ++){
+      pixels[i][j] = white;
       zbuf[i][j] = init;
+    }
   }
 }
 
@@ -168,9 +171,9 @@ void Image::scanline(int bx, int by, double bz,
                      int mx, int my, double mz,
                      int tx, int ty, double tz,
                      pixel p){
-  p.r = rand() % 256;
-  p.g = rand() % 256;
-  p.b = rand() % 256;
+  // p.r = rand() % 256;
+  // p.g = rand() % 256;
+  // p.b = rand() % 256;
   order(bx, by, bz, mx, my, mz, tx, ty, tz);
   double x0 = bx, x1 = bx;
   int y = by;
@@ -196,25 +199,39 @@ void Image::scanline(int bx, int by, double bz,
   plot(tx, ty, tz, p);
 }
 
-void Image::plotPolygons(Polygons &m, pixel p){
-  double vx0, vy0, vx1, vy1;
+void Image::plotPolygons(Polygons &m, pixel p,
+                         pixel ambient, light point,
+                         double *areflect, double *dreflect, double *sreflect){
+  // double vx0, vy0, vx1, vy1;
+  double *norm;
+  pixel l;
   for (int i = 0; i < m.getCols(); i += 3){
-    vx0 = m.getX(i+1) - m.getX(i);
-    vy0 = m.getY(i+1) - m.getY(i);
-    vx1 = m.getX(i+2) - m.getX(i);
-    vy1 = m.getY(i+2) - m.getY(i);
-    if (vx0 * vy1 > vy0 * vx1)
+    norm = normal(m, i);
+    // vx0 = m.getX(i+1) - m.getX(i);
+    // vy0 = m.getY(i+1) - m.getY(i);
+    // vx1 = m.getX(i+2) - m.getX(i);
+    // vy1 = m.getY(i+2) - m.getY(i);
+    l = get_lighting(norm, ambient, point, areflect, dreflect, sreflect);
+    // p.r = min(p.r, l.r);
+    // p.g = min(p.g, l.g);
+    // p.b = min(p.b, l.b);
+    // p.r = p.r * l.r / 255;
+    // p.g = p.g * l.g / 255;
+    // p.b = p.b * l.b / 255;
+    if (norm[2] > 0)
       scanline(m.getX(i), m.getY(i), m.getZ(i),
                m.getX(i+1), m.getY(i+1), m.getZ(i+1),
                m.getX(i+2), m.getY(i+2), m.getZ(i+2),
-               p);
+               pixel{p.r * l.r / 255,
+                     p.g * l.g / 255,
+                     p.b * l.b / 255});
   }
 }
 
 void Image::clear(){
-  pixel p{0, 0, 0};
+  pixel p{255, 255, 255};
   double init = numeric_limits<double>::lowest();
-  cout << init << endl;
+  // cout << init << endl;
   for (int i = 0; i < width; i ++)
     for (int j = 0; j < height; j ++){
       pixels[i][j] = p;
@@ -242,7 +259,8 @@ void Image::draw(const char *fileName){
   pclose(f);
 }
 
-void Image::parse(){
+void Image::parse(pixel ambient, light point,
+                  double *areflect, double *dreflect, double *sreflect){
   stack<Transform> s;
   // Edges &e = *(new Edges());
   Edges e;
@@ -278,21 +296,27 @@ void Image::parse(){
       cin >> x >> y >> z >> w >> h >> d;
       p.addBox(x, y, z, w, h, d);
       s.top().mult(p);
-      plotPolygons(p, pixel{0, 0, 255});
+      plotPolygons(p, pixel{0, 200, 255},
+                   ambient, point,
+                   areflect, dreflect, sreflect);
       p.clear();
     }
     else if (command == "sphere"){
       cin >> x >> y >> z >> r1;
       p.addSphere(x, y, z, r1);
       s.top().mult(p);
-      plotPolygons(p, pixel{128, 128, 0});
+      plotPolygons(p, pixel{64, 64, 255},
+                   ambient, point,
+                   areflect, dreflect, sreflect);
       p.clear();
     }
     else if (command == "torus"){
       cin >> x >> y >> z >> r1 >> r2;
       p.addTorus(x, y, z, r1, r2);
       s.top().mult(p);
-      plotPolygons(p, pixel{128, 0, 128});
+      plotPolygons(p, pixel{255, 64, 64},
+                   ambient, point,
+                   areflect, dreflect, sreflect);
       p.clear();
     }
     else if (command == "hermite"){

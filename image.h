@@ -43,7 +43,9 @@ public:
                 int x2, int y2, double z2,
                 pixel p);
 
-  void plotPolygons(Polygons &m, pixel p);
+  void plotPolygons(Polygons &m, pixel p,
+                    pixel ambient, light point,
+                    double *areflect, double *dreflect, double *sreflect);
 
   void clear();
 
@@ -51,6 +53,7 @@ public:
 
   void draw(const char *fileName);
 
-  void parse();
+  void parse(pixel ambient, light point,
+             double *areflect, double *dreflect, double *sreflect);
 
 };
